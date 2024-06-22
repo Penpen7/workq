@@ -1,0 +1,12 @@
+[package]
+name = "workq"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { version = "1.0.86", features = ["backtrace"] }
+chrono = "0.4.38"
+clap = { version = "4.5.7", features = ["derive"] }
+dirs = "5.0.1"
+itertools = "0.13.0"
+thiserror = "1.0.63"
