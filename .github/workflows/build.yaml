@@ -36,17 +36,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Read rust-toolchain
-        shell: bash
-        id: rust-toolchain
-        run: echo "TOOLCHAIN_VERSION=$(cat rust-toolchain)" >> $GITHUB_ENV
-      - name: Remove rust-toolchain
-        shell: bash
-        run: rm rust-toolchain
       - name: Installing Rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{ env.TOOLCHAIN_VERSION }}
+          toolchain: stable
           targets: ${{ matrix.job.target }}
       - name: Install cross
         if: matrix.job.use-cross
