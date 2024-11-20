@@ -33,20 +33,7 @@ pub fn create() -> Result<(), CreateError> {
     std::fs::create_dir_all(&path)
         .map_err(|e| CreateError::CantCreateDirectory(anyhow::Error::from(e)))?;
 
-    // check if git is installed
-    let installed_git = std::process::Command::new("git")
-        .arg("--version")
-        .output()
-        .is_ok();
-
-    if installed_git {
-        // run git init
-        std::process::Command::new("git")
-            .arg("init")
-            .current_dir(&path)
-            .output()
-            .map_err(|e| CreateError::CantGitInit(anyhow::Error::from(e)))?;
-    }
+    git2::Repository::init(&path).map_err(|e| CreateError::CantGitInit(anyhow::Error::from(e)))?;
 
     println!(
         "{}",
