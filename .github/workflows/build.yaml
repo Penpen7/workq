@@ -1,0 +1,86 @@
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    name: Publishing for ${{ matrix.job.os }}
+    runs-on: ${{ matrix.job.os }}
+    strategy:
+      matrix:
+        job:
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            use-cross: false
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            use-cross: false
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            use-cross: false
+          - os: ubuntu-20.04
+            target: x86_64-unknown-linux-gnu
+            use-cross: false
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            use-cross: true
+          - os: ubuntu-20.04
+            target: i686-unknown-linux-gnu
+            use-cross: true
+          - os: ubuntu-20.04
+            target: arm-unknown-linux-gnueabihf
+            use-cross: true
+          - os: ubuntu-20.04
+            target: aarch64-unknown-linux-gnu
+            use-cross: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Read rust-toolchain
+        shell: bash
+        id: rust-toolchain
+        run: echo "TOOLCHAIN_VERSION=$(cat rust-toolchain)" >> $GITHUB_ENV
+      - name: Remove rust-toolchain
+        shell: bash
+        run: rm rust-toolchain
+      - name: Installing Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.TOOLCHAIN_VERSION }}
+          targets: ${{ matrix.job.target }}
+      - name: Install cross
+        if: matrix.job.use-cross
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+      - name: Cargo build
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 10.7
+        shell: bash
+        run: |
+          if [[ "${{ matrix.job.use-cross }}" == "true" ]]; then
+            cross build --release --target ${{ matrix.job.target }}
+          else
+            cargo build --release --target ${{ matrix.job.target }}
+          fi
+      - name: Rename binery and Archive
+        shell: bash
+        run: |
+          if [[ "${{ matrix.job.os }}" == "windows-latest" ]]; then
+            mv target/${{ matrix.job.target }}/release/workq ./workq-${{ matrix.job.target }}.exe
+            tar -czf workq-${{ matrix.job.target }}.tar.gz workq-${{ matrix.job.target }}.exe LICENSE README.md
+            7z a workq-${{ matrix.job.target }}.zip workq-${{ matrix.job.target }}.exe LICENSE README.md
+          else
+            mv target/${{ matrix.job.target }}/release/workq ./workq-${{ matrix.job.target }}
+            tar -czf workq-${{ matrix.job.target }}.tar.gz workq-${{ matrix.job.target }}
+            zip workq-${{ matrix.job.target }}.zip workq-${{ matrix.job.target }}
+          fi
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: |
+            ./workq-${{ matrix.job.target }}.tar.gz
+            ./workq-${{ matrix.job.target }}.zip
