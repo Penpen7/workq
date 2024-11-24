@@ -8,6 +8,6 @@ anyhow = { version = "1.0.86", features = ["backtrace"] }
 chrono = "0.4.38"
 clap = { version = "4.5.7", features = ["derive"] }
 dirs = "5.0.1"
-git2 = "0.19.0"
+git2 = { version = "0.19.0", default-features = false }
 itertools = "0.13.0"
 thiserror = "1.0.63"
