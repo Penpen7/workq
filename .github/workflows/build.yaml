@@ -6,6 +6,8 @@ jobs:
   build:
     name: Publishing for ${{ matrix.job.os }}
     runs-on: ${{ matrix.job.os }}
+    permissions:
+      contents: write
     strategy:
       matrix:
         job:
@@ -61,8 +63,8 @@ jobs:
         run: |
           if [[ "${{ matrix.job.os }}" == "windows-latest" ]]; then
             mv target/${{ matrix.job.target }}/release/workq ./workq-${{ matrix.job.target }}.exe
-            tar -czf workq-${{ matrix.job.target }}.tar.gz workq-${{ matrix.job.target }}.exe LICENSE README.md
-            7z a workq-${{ matrix.job.target }}.zip workq-${{ matrix.job.target }}.exe LICENSE README.md
+            tar -czf workq-${{ matrix.job.target }}.tar.gz workq-${{ matrix.job.target }}.exe
+            7z a workq-${{ matrix.job.target }}.zip workq-${{ matrix.job.target }}.exe
           else
             mv target/${{ matrix.job.target }}/release/workq ./workq-${{ matrix.job.target }}
             tar -czf workq-${{ matrix.job.target }}.tar.gz workq-${{ matrix.job.target }}
