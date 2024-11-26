@@ -62,13 +62,13 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ matrix.job.os }}" == "windows-latest" ]]; then
-            mv target/${{ matrix.job.target }}/release/workq ./workq-${{ matrix.job.target }}.exe
-            tar -czf workq-${{ matrix.job.target }}.tar.gz workq-${{ matrix.job.target }}.exe
-            7z a workq-${{ matrix.job.target }}.zip workq-${{ matrix.job.target }}.exe
+            mv target/${{ matrix.job.target }}/release/workq ./workq.exe
+            tar -czf workq-${{ matrix.job.target }}.tar.gz workq.exe
+            7z a workq-${{ matrix.job.target }}.zip workq.exe
           else
-            mv target/${{ matrix.job.target }}/release/workq ./workq-${{ matrix.job.target }}
-            tar -czf workq-${{ matrix.job.target }}.tar.gz workq-${{ matrix.job.target }}
-            zip workq-${{ matrix.job.target }}.zip workq-${{ matrix.job.target }}
+            mv target/${{ matrix.job.target }}/release/workq ./workq
+            tar -czf workq-${{ matrix.job.target }}.tar.gz workq
+            zip workq-${{ matrix.job.target }}.zip workq
           fi
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
